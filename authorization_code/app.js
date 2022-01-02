@@ -13,10 +13,10 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = '9ef80db826774f8b83e9ef6bc6c06765'; // Your client id
-var client_secret = '50cb47ccc1aa422abae0afbf546e905d'; // Your secret
+var client_id = ''; // Your client id
+var client_secret = ''; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
-var TOKEN = 'BQConuJaRRXaOwgkCRm_32WgATrHvLDj0F8q_CgLG65e3vxPvg62F8jzSi42EqR0MwyXT2VmRzJv1u98ftUuS4R-qd4bYjorKqZz46BXOwdWWi4x1vRYNCiIs7MTqbljCyK4AIvjDikLwHWSmz0';
+var TOKEN = ''; // Your user-top-view token
 
 /**
  * Generates a random string containing numbers and letters
