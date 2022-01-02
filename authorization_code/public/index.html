@@ -27,7 +27,19 @@
         </div>
         <div id="oauth">
         </div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+		    <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+        <div id="top-tracks">
+		    </div>
+        <div id="top-tracks-med">
+		    </div>
+        <div id="top-tracks-long">
+		    </div>
+        <div id="top-artists">
+		    </div>
+        <div id="top-artists-med">
+		    </div>
+        <div id="top-artists-long">
+		    </div>
       </div>
     </div>
 
@@ -59,6 +71,38 @@
       </dl>
     </script>
 
+	  <script id="top-tracks-template" type="text/x-handlebars-template">
+      <h2>Top Tracks</h2>
+      <dl class="dl-horizontal">
+        <dt>Tracks</dt><dd class="text-overflow">{{list}}</dd>
+        <dt>href</dt><dd class="text-overflow">{{href}}</dd>
+      </dl>
+    </script>
+
+	  <script id="top-tracks-med-template" type="text/x-handlebars-template">
+      <h2>Top Tracks</h2>
+      <dl class="dl-horizontal">
+        <dt>Tracks</dt><dd class="text-overflow">{{list}}</dd>
+        <dt>href</dt><dd class="text-overflow">{{href}}</dd>
+      </dl>
+    </script>
+
+	  <script id="top-tracks-long-template" type="text/x-handlebars-template">
+      <h2>Top Tracks</h2>
+      <dl class="dl-horizontal">
+        <dt>Tracks</dt><dd class="text-overflow">{{list}}</dd>
+        <dt>href</dt><dd class="text-overflow">{{href}}</dd>
+      </dl>
+    </script>
+
+    <script id="top-artists-template" type="text/x-handlebars-template">
+      <h2>Top Artists</h2>
+      <dl class="dl-horizontal">
+        <dt>Artists</dt><dd class="text-overflow">{{list}}</dd>
+        <dt>href</dt><dd class="text-overflow">{{href}}</dd>
+      </dl>
+    </script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script>
@@ -86,12 +130,33 @@
             oauthTemplate = Handlebars.compile(oauthSource),
             oauthPlaceholder = document.getElementById('oauth');
 
+		    var topTracksSource = document.getElementById('top-tracks-template').innerHTML,
+            topTracksTemplate = Handlebars.compile(topTracksSource),
+            topTracksPlaceholder = document.getElementById('top-tracks');
+
+        var topTracksMedSource = document.getElementById('top-tracks-med-template').innerHTML,
+            topTracksMedTemplate = Handlebars.compile(topTracksSource), 
+            topTracksMedPlaceholder = document.getElementById('top-tracks-med');
+
+        var topTracksLongSource = document.getElementById('top-tracks-long-template').innerHTML,
+            topTracksLongTemplate = Handlebars.compile(topTracksSource), 
+            topTracksLongPlaceholder = document.getElementById('top-tracks-long');
+
+		    var topArtistsSource = document.getElementById('top-artists-template').innerHTML,
+            topArtistsTemplate = Handlebars.compile(topArtistsSource),
+            topArtistsPlaceholder = document.getElementById('top-artists');
+            
+        var topArtistsMedPlaceholder = document.getElementById('top-artists-med');
+
+        var topArtistsLongPlaceholder = document.getElementById('top-artists-long');
+
         var params = getHashParams();
 
         var access_token = params.access_token,
             refresh_token = params.refresh_token,
             error = params.error;
 
+        // auth stuff
         if (error) {
           alert('There was an error during the authentication');
         } else {
@@ -109,6 +174,7 @@
                 },
                 success: function(response) {
                   userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
 
                   $('#login').hide();
                   $('#loggedin').show();
@@ -134,9 +200,139 @@
               });
             });
           }, false);
+
+          $.ajax({
+                url: '/top/tracks/short',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    // console.log(data.items[i]);
+                    var artists_string = '';
+                    for (let j = 0; j < data.items[i].artists.length; j++) {
+                      if (j == 0) {
+                        artists_string = data.items[i].artists[0].name;
+                      } else {
+                        artists_string = artists_string + ", " + data.items[i].artists[j].name;
+                      }
+                    }
+                    string_list = string_list + "<li>" + data.items[i].name + " - " + artists_string + "</li>";
+                  }
+                  topTracksPlaceholder.innerHTML = "<h3>Top Tracks (Short Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
+
+            $.ajax({
+                url: '/top/tracks/medium',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    // console.log(data.items[i]);
+                    var artists_string = '';
+                    for (let j = 0; j < data.items[i].artists.length; j++) {
+                      if (j == 0) {
+                        artists_string = data.items[i].artists[0].name;
+                      } else {
+                        artists_string = artists_string + ", " + data.items[i].artists[j].name;
+                      }
+                    }
+                    string_list = string_list + "<li>" + data.items[i].name + " - " + artists_string + "</li>";
+                  }
+                  topTracksMedPlaceholder.innerHTML = "<h3>Top Tracks (Medium Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
+
+            $.ajax({
+                url: '/top/tracks/long',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    // console.log(data.items[i]);
+                    var artists_string = '';
+                    for (let j = 0; j < data.items[i].artists.length; j++) {
+                      if (j == 0) {
+                        artists_string = data.items[i].artists[0].name;
+                      } else {
+                        artists_string = artists_string + ", " + data.items[i].artists[j].name;
+                      }
+                    }
+                    string_list = string_list + "<li>" + data.items[i].name + " - " + artists_string + "</li>";
+                  }
+                  topTracksLongPlaceholder.innerHTML = "<h3>Top Tracks (Long Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
+
+            $.ajax({
+                url: '/top/artists/short',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    console.log(data.items[i]);
+                    var artists_string = '';
+                    string_list = string_list + "<li>" + data.items[i].name + "</li>";
+                  }
+                  topArtistsPlaceholder.innerHTML = "<h3>Top Artists (Short Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
+
+            $.ajax({
+                url: '/top/artists/medium',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    console.log(data.items[i]);
+                    var artists_string = '';
+                    string_list = string_list + "<li>" + data.items[i].name + "</li>";
+                  }
+                  topArtistsMedPlaceholder.innerHTML = "<h3>Top Artists (Medium Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
+            
+            $.ajax({
+                url: '/top/artists/long',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  var data = response;
+                  var string_list = '<ol>';
+                  for (let i = 0; i < data.items.length; i++) {
+                    console.log(data.items[i]);
+                    var artists_string = '';
+                    string_list = string_list + "<li>" + data.items[i].name + "</li>";
+                  }
+                  topArtistsLongPlaceholder.innerHTML = "<h3>Top Artists (Long Term)</h3>" + string_list + "</ol>";
+                  // topTracksPlaceholder.innerHTML = topTracksTemplate(response);
+                },
+            });
         }
       })();
     </script>
+    
   </body>
 </html>
 

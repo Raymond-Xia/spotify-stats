@@ -13,9 +13,10 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = 'CLIENT_ID'; // Your client id
-var client_secret = 'CLIENT_SECRET'; // Your secret
-var redirect_uri = 'REDIRECT_URI'; // Your redirect uri
+var client_id = '9ef80db826774f8b83e9ef6bc6c06765'; // Your client id
+var client_secret = '50cb47ccc1aa422abae0afbf546e905d'; // Your secret
+var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var TOKEN = 'BQConuJaRRXaOwgkCRm_32WgATrHvLDj0F8q_CgLG65e3vxPvg62F8jzSi42EqR0MwyXT2VmRzJv1u98ftUuS4R-qd4bYjorKqZz46BXOwdWWi4x1vRYNCiIs7MTqbljCyK4AIvjDikLwHWSmz0';
 
 /**
  * Generates a random string containing numbers and letters
@@ -46,7 +47,7 @@ app.get('/login', function(req, res) {
   res.cookie(stateKey, state);
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email';
+  var scope = 'user-read-private user-read-email user-top-read';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -81,7 +82,7 @@ app.get('/callback', function(req, res) {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
       },
       json: true
     };
@@ -125,7 +126,7 @@ app.get('/refresh_token', function(req, res) {
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
       refresh_token: refresh_token
@@ -139,8 +140,176 @@ app.get('/refresh_token', function(req, res) {
       res.send({
         'access_token': access_token
       });
+      console.log(body);
     }
   });
+});
+
+app.get('/top/tracks/short', function(req, res) {
+
+  // // requesting access token from refresh token
+  // var refresh_token = req.query.refresh_token;
+  // console.log(refresh_token);
+  // // var code = req.query.code || null;
+  // var authOptions = {
+  //   url: 'https://accounts.spotify.com/api/token',
+  //   headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
+  //   form: {
+  //     grant_type: 'refresh_token',
+  //     refresh_token: refresh_token,
+  //     scope: 'user-top-read'
+  //   },
+  //   json: true
+  // };
+  // var token = '';
+  // request.post(authOptions, function(error, response, body) {
+  //   console.log(body);
+  //   if (!error && response.statusCode === 200) {
+  //     token = body.access_token;
+  // //     res.send({
+  // //       'access_token': access_token
+  // //     });
+  // //     console.log(body);
+  // //     authOptions = {
+  // //       url: 'https://api.spotify.com/v1/me/top/tracks',
+  // //       headers: { 'Authorization': 'Bearer ' + access_token },
+  // //       form: {
+  // //         // grant_type: 'bearer_token',
+  // //         // bearer_token: bearer_token
+  // //       },
+  // //       json: true
+  // //     };
+  // //     // console.log(authOptions);
+  // //     request.get(authOptions, function(error, response, body) {
+  // //       if (!error && response.statusCode === 200) {
+  // //         console.log("ok");
+  // //       }
+  // //       // console.log(body);
+  // //     });
+  //   }
+  // });
+
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      // console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+  
+});
+
+app.get('/top/tracks/medium', function(req, res) {
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?time_range=medium_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      // console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+});
+  
+app.get('/top/tracks/long', function(req, res) {
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/tracks?time_range=long_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      // console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+});
+
+app.get('/top/artists/short', function(req, res) {
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/artists?time_range=short_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+  
+});
+
+app.get('/top/artists/medium', function(req, res) {
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/artists?time_range=medium_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+  
+});
+
+app.get('/top/artists/long', function(req, res) {
+  var token = TOKEN;
+  authOptions = {
+    url: 'https://api.spotify.com/v1/me/top/artists?time_range=long_term',
+    headers: { 'Authorization': 'Bearer ' + token },
+    json: true
+  };
+  request.get(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var items = body.items;
+      res.send({
+        'items': items
+      });
+      console.log(body);
+      console.log("ok");
+    }
+    // console.log(body);
+  });
+  
 });
 
 console.log('Listening on 8888');
