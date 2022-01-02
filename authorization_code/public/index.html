@@ -18,28 +18,30 @@
 
   <body>
     <div class="container">
-      <div id="login">
-        <h1>This is an example of the Authorization Code flow</h1>
+      <div id="login" class="jumbotron">
+        <div class="page-header">
+          <h1>Spotify Stats <small>by Raymond Xia</small></h1>
+        </div>
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
         <div id="user-profile">
         </div>
-        <div id="oauth">
-        </div>
-		    <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+        <!-- <div id="oauth">
+        </div> -->
+		    <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button> -->
         <div id="top-tracks">
-		    </div>
+        </div>
         <div id="top-tracks-med">
-		    </div>
+        </div>
         <div id="top-tracks-long">
-		    </div>
+        </div>
         <div id="top-artists">
-		    </div>
+        </div>
         <div id="top-artists-med">
-		    </div>
+        </div>
         <div id="top-artists-long">
-		    </div>
+        </div>
       </div>
     </div>
 
@@ -161,11 +163,11 @@
           alert('There was an error during the authentication');
         } else {
           if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
+            // // render oauth info
+            // oauthPlaceholder.innerHTML = oauthTemplate({
+            //   access_token: access_token,
+            //   refresh_token: refresh_token
+            // });
 
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
@@ -186,20 +188,20 @@
               $('#loggedin').hide();
           }
 
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
-              }
-            }).done(function(data) {
-              access_token = data.access_token;
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
-              });
-            });
-          }, false);
+          // document.getElementById('obtain-new-token').addEventListener('click', function() {
+          //   $.ajax({
+          //     url: '/refresh_token',
+          //     data: {
+          //       'refresh_token': refresh_token
+          //     }
+          //   }).done(function(data) {
+          //     access_token = data.access_token;
+          //     oauthPlaceholder.innerHTML = oauthTemplate({
+          //       access_token: access_token,
+          //       refresh_token: refresh_token
+          //     });
+          //   });
+          // }, false);
 
           $.ajax({
                 url: '/top/tracks/short',
