@@ -1,12 +1,3 @@
-/**
- * This is an example of a basic node.js script that performs
- * the Authorization Code oAuth2 flow to authenticate against
- * the Spotify Accounts.
- *
- * For more information, read
- * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
- */
-
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 var cors = require('cors');
@@ -15,7 +6,7 @@ var cookieParser = require('cookie-parser');
 
 var client_id = 'CLIENT_ID'; // Your client id
 var client_secret = 'CLIENT_SECRET'; // Your secret
-var redirect_uri = 'REDIRECT_URI'; // Your redirect uri
+var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 var TOKEN = 'TOKEN'; // Your user-top-view token
 
 /**
@@ -60,7 +51,7 @@ app.get('/login', function(req, res) {
 
 app.get('/callback', function(req, res) {
 
-  // your application requests refresh and access tokens
+  // application requests refresh and access tokens
   // after checking the state parameter
 
   var code = req.query.code || null;
@@ -90,12 +81,12 @@ app.get('/callback', function(req, res) {
     request.post(authOptions, function(error, response, body) {
       if (!error && response.statusCode === 200) {
 
-        var access_token = body.access_token,
-            refresh_token = body.refresh_token;
+        TOKEN = body.access_token,
+        refresh_token = body.refresh_token;
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + access_token },
+          headers: { 'Authorization': 'Bearer ' + TOKEN },
           json: true
         };
 
@@ -107,7 +98,7 @@ app.get('/callback', function(req, res) {
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
           querystring.stringify({
-            access_token: access_token,
+            access_token: TOKEN,
             refresh_token: refresh_token
           }));
       } else {
@@ -140,55 +131,12 @@ app.get('/refresh_token', function(req, res) {
       res.send({
         'access_token': access_token
       });
-      console.log(body);
     }
   });
 });
 
 app.get('/top/tracks/short', function(req, res) {
-
-  // // requesting access token from refresh token
-  // var refresh_token = req.query.refresh_token;
-  // console.log(refresh_token);
-  // // var code = req.query.code || null;
-  // var authOptions = {
-  //   url: 'https://accounts.spotify.com/api/token',
-  //   headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
-  //   form: {
-  //     grant_type: 'refresh_token',
-  //     refresh_token: refresh_token,
-  //     scope: 'user-top-read'
-  //   },
-  //   json: true
-  // };
-  // var token = '';
-  // request.post(authOptions, function(error, response, body) {
-  //   console.log(body);
-  //   if (!error && response.statusCode === 200) {
-  //     token = body.access_token;
-  // //     res.send({
-  // //       'access_token': access_token
-  // //     });
-  // //     console.log(body);
-  // //     authOptions = {
-  // //       url: 'https://api.spotify.com/v1/me/top/tracks',
-  // //       headers: { 'Authorization': 'Bearer ' + access_token },
-  // //       form: {
-  // //         // grant_type: 'bearer_token',
-  // //         // bearer_token: bearer_token
-  // //       },
-  // //       json: true
-  // //     };
-  // //     // console.log(authOptions);
-  // //     request.get(authOptions, function(error, response, body) {
-  // //       if (!error && response.statusCode === 200) {
-  // //         console.log("ok");
-  // //       }
-  // //       // console.log(body);
-  // //     });
-  //   }
-  // });
-
+  console.log(TOKEN);
   var token = TOKEN;
   authOptions = {
     url: 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term',
@@ -201,10 +149,7 @@ app.get('/top/tracks/short', function(req, res) {
       res.send({
         'items': items
       });
-      // console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
   
 });
@@ -222,10 +167,7 @@ app.get('/top/tracks/medium', function(req, res) {
       res.send({
         'items': items
       });
-      // console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
 });
   
@@ -242,10 +184,7 @@ app.get('/top/tracks/long', function(req, res) {
       res.send({
         'items': items
       });
-      // console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
 });
 
@@ -262,10 +201,7 @@ app.get('/top/artists/short', function(req, res) {
       res.send({
         'items': items
       });
-      console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
   
 });
@@ -283,10 +219,7 @@ app.get('/top/artists/medium', function(req, res) {
       res.send({
         'items': items
       });
-      console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
   
 });
@@ -304,10 +237,7 @@ app.get('/top/artists/long', function(req, res) {
       res.send({
         'items': items
       });
-      console.log(body);
-      console.log("ok");
     }
-    // console.log(body);
   });
   
 });
